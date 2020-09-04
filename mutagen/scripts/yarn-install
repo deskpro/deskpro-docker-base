@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+print_help() {
+  echo "Usage: $0 -p PATH"
+  exit 2
+}
+
+COMMAND_PATHS=()
+
+while getopts "p:" c; do
+  case $c in
+    p) COMMAND_PATHS+=("$OPTARG") ;;
+    *) print_help ;;
+  esac
+done
+
+for command_path in "${COMMAND_PATHS[@]}"; do
+  pushd "$command_path"
+    yarn install
+  popd
+done

@@ -1,0 +1,40 @@
+#!/bin/bash
+set -e
+
+print_help() {
+  echo "Usage: $0 -p PATH"
+  exit 2
+}
+
+COMMAND_PATHS=()
+
+while getopts "p:" c; do
+  case $c in
+    p) COMMAND_PATHS+=("$OPTARG") ;;
+    *) print_help ;;
+  esac
+done
+
+if [ ! -x /usr/local/bin/composer ]; then
+  # Install composer
+  php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+  php composer-setup.php
+  rm -f composer-setup.php
+  mv composer.phar /usr/local/bin/composer
+elif [ $(( $(date +%s) - $(date +%s -r /usr/local/bin/composer) )) -gt 864000 ]; then
+  # Update composer
+  composer self-update
+fi
+
+# Install composer concurrency plugin
+if ! composer global info hirak/prestissimo >> /dev/null 2>&1; then
+  composer global require hirak/prestissimo
+  rm -rf /root/.composer/cache
+fi
+
+# Composer installs for each composer projects
+for command_path in "${COMMAND_PATHS[@]}"; do
+  pushd "$command_path"
+    composer install
+  popd
+done
