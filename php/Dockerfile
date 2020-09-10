@@ -100,8 +100,7 @@ RUN make install
 RUN mkdir -p /etc/php
 RUN cp php.ini-production /etc/php/php.ini
 RUN mv /etc/php/php-fpm.conf.default /etc/php/php-fpm.conf
-RUN mv /etc/php/php-fpm.d/www.conf.default /etc/php/php-fpm.d/www.conf
-RUN sed -i -e 's/^listen = .*/listen = 0.0.0.0:9000/g' /etc/php/php-fpm.d/www.conf
+RUN rm -f /etc/php/php-fpm.d/*
 RUN rm -f /usr/lib/php/extensions/*/*.a
 
 FROM ubuntu:20.04
@@ -118,6 +117,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     libkrb5-3 \
     libc-client2007e \
     libzip5 \
+    gettext \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /etc/php/
@@ -144,6 +144,9 @@ RUN chmod a+x /etc/docker-entrypoint/*
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod a+x /usr/local/bin/entrypoint.sh
+
+COPY www.conf.template /etc/php/php-fpm.d/www.conf.template
+RUN ln -s /dev/stderr /var/log/php-fpm.log
 
 WORKDIR /srv
 EXPOSE 9000
