@@ -8,11 +8,14 @@ rm -f "/etc/nginx/sites-enabled/default"
 
 # Produce a string list of each exported environment
 # variable that has a name starting with DESKPRO_
-exported_vars=$(env | sed -n 's/^\(DESKPRO_.*\)=.*/\1/p')
-deskpro_var_list=""
+exported_vars=$(env | sed -n 's/^DESKPRO_\([a-zA-Z0-9_]*\)=.*/\1/p')
 
-for var in $exported_vars; do
-  deskpro_var_list="$deskpro_var_list \$${var} "
+rm -f /etc/nginx/deskpro_fastcgi_params
+touch /etc/nginx/deskpro_fastcgi_params
+
+for var_name in $exported_vars; do
+  eval var_value="\$DESKPRO_${var_name}"
+  echo "fastcgi_param ${var_name} \"${var_value}\";" >> /etc/nginx/deskpro_fastcgi_params
 done
 
 # Generate the nginx master configuration
@@ -25,7 +28,7 @@ for template_file in /etc/nginx/sites-available/*.template; do
   [ -f "$template_file" ] || continue
 
   config_file=$(echo "$template_file" | sed -e 's/\.template$//')
-  envsubst "\$VIRTUAL_HOST \$FASTCGI_HOST $deskpro_var_list" < "$template_file" > "$config_file"
+  envsubst "\$VIRTUAL_HOST \$FASTCGI_HOST" < "$template_file" > "$config_file"
 
   config_filename=$(basename "$config_file")
   rm -f "/etc/nginx/sites-enabled/$config_filename"
