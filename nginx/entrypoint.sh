@@ -14,7 +14,7 @@ touch /etc/nginx/deskpro_fastcgi_params
 exported_vars=$(env | sed -n 's/^\(DESKPRO_[a-zA-Z0-9_]*\)=.*/\1/p')
 
 for var_name in $exported_vars; do
-  eval var_value="\$DESKPRO_${var_name}"
+  eval var_value="\$${var_name}"
   echo "fastcgi_param ${var_name} \"${var_value}\";" >> /etc/nginx/deskpro_fastcgi_params
 done
 
@@ -24,7 +24,7 @@ done
 exported_vars=$(env | sed -n 's/^ENV_\([a-zA-Z0-9_]*\)=.*/\1/p')
 
 for var_name in $exported_vars; do
-  eval var_value="\$DESKPRO_${var_name}"
+  eval var_value="\$ENV_${var_name}"
   echo "fastcgi_param ${var_name} \"${var_value}\";" >> /etc/nginx/deskpro_fastcgi_params
 done
 
