@@ -19,7 +19,7 @@ echo >> /etc/php/php-fpm.d/www.conf
 exported_vars=$(env | sed -n 's/^\(DESKPRO_[a-zA-Z0-9_]*\)=.*/\1/p')
 
 for var_name in $exported_vars; do
-  echo "env[${var_name}] = \$${var_name};" >> /etc/php/php-fpm.d/www.conf
+  echo "env[${var_name}] = \$${var_name}" >> /etc/php/php-fpm.d/www.conf
 done
 
 # Produce a string list of each exported environment
@@ -28,5 +28,5 @@ done
 exported_vars=$(env | sed -n 's/^ENV_\([a-zA-Z0-9_]*\)=.*/\1/p')
 
 for var_name in $exported_vars; do
-  echo "env[${var_name}] = \$ENV_${var_name};" >> /etc/php/php-fpm.d/www.conf
+  echo "env[${var_name}] = \$ENV_${var_name}" >> /etc/php/php-fpm.d/www.conf
 done
