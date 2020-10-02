@@ -10,6 +10,9 @@ export FPM_MAX_REQUESTS=${FPM_MAX_REQUESTS:-0}
 envsubst '$FPM_MAX_CHILDREN $FPM_START_SERVERS $FPM_MIN_SPARE_SERVERS $FPM_MAX_SPARE_SERVERS $FPM_PROCESS_IDLE_TIMEOUT $FPM_MAX_REQUESTS' \
   < "/etc/php/php-fpm.d/www.conf.template" > "/etc/php/php-fpm.d/www.conf"
 
+# Insert a new line for safety
+echo >> /etc/php/php-fpm.d/www.conf
+
 # Produce a string list of each exported environment
 # variable that has a name starting with DESKPRO_
 # Add the environment variable to fastcgi params as is
