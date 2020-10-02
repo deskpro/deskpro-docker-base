@@ -5,13 +5,23 @@ set -e
 export WORKER_PROCESSES=${WORKER_PROCESSES:-"auto"}
 
 rm -f "/etc/nginx/sites-enabled/default"
+rm -f /etc/nginx/deskpro_fastcgi_params
+touch /etc/nginx/deskpro_fastcgi_params
 
 # Produce a string list of each exported environment
 # variable that has a name starting with DESKPRO_
-exported_vars=$(env | sed -n 's/^DESKPRO_\([a-zA-Z0-9_]*\)=.*/\1/p')
+# Add the environment variable to fastcgi params as is
+exported_vars=$(env | sed -n 's/^\(DESKPRO_[a-zA-Z0-9_]*\)=.*/\1/p')
 
-rm -f /etc/nginx/deskpro_fastcgi_params
-touch /etc/nginx/deskpro_fastcgi_params
+for var_name in $exported_vars; do
+  eval var_value="\$DESKPRO_${var_name}"
+  echo "fastcgi_param ${var_name} \"${var_value}\";" >> /etc/nginx/deskpro_fastcgi_params
+done
+
+# Produce a string list of each exported environment
+# variable that has a name starting with ENV_
+# Add the environment variable to fastcgi params with the prefix dropped
+exported_vars=$(env | sed -n 's/^ENV_\([a-zA-Z0-9_]*\)=.*/\1/p')
 
 for var_name in $exported_vars; do
   eval var_value="\$DESKPRO_${var_name}"
