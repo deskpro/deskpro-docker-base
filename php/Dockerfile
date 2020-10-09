@@ -42,12 +42,14 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     libc-client2007e-dev \
     libzip5 \
     libzip-dev \
+    libfreetype6 \
+    libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
 
-ADD https://www.php.net/distributions/php-7.4.5.tar.gz /root/
-RUN mkdir php-7.4.5 && tar -xzf /root/php-7.4.5.tar.gz -C php-7.4.5 --strip-components 1
+ADD https://www.php.net/distributions/php-7.4.11.tar.gz /root/
+RUN mkdir php-7.4.11 && tar -xzf /root/php-7.4.11.tar.gz -C php-7.4.11 --strip-components 1
 
-WORKDIR /root/php-7.4.5
+WORKDIR /root/php-7.4.11
 RUN ./buildconf --force
 RUN ./configure \
     --with-fpm-user=php \
@@ -81,6 +83,7 @@ RUN ./configure \
     --enable-pdo=shared \
     --with-pdo-mysql=shared,mysqlnd \
     --enable-gd=shared \
+    --with-freetype=shared \
     --with-curl=shared \
     --enable-mysqlnd=shared \
     --enable-intl=shared \
@@ -118,6 +121,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     libc-client2007e \
     libzip5 \
     gettext \
+    libfreetype6 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /etc/php/
