@@ -1,4 +1,4 @@
-FROM mysql:8.0
+FROM mysql:8.0.22
 
 COPY restore-db.sh /usr/local/bin/restore-db
 COPY wait-til-mysql-ready.sh /usr/local/bin/wait-til-mysql-ready
