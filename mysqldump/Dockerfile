@@ -1,5 +1,10 @@
 FROM alpine:3.12.1
 
-RUN apk add --no-cache mysql-client gzip
+RUN apk add --no-cache \
+    mysql-client \
+    zip
 
-ENTRYPOINT /usr/bin/mysqldump -h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASS $MYSQL_DBNAME | /usr/bin/gzip > $DUMP_PATH
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod a+x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
