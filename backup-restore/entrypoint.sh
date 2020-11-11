@@ -11,10 +11,10 @@ EOF
 chmod 600 ~/.my.cnf
 
 # Unzip the DB dump and pipe into MySQL
-unzip -p "${BACKUP_ARTIFACT_PATH}" "${BACKUP_DB_DUMP_NAME}" | mysql "${MYSQL_DBNAME}"
+unzip -p "${BACKUP_PATH}" "${BACKUP_DB_DUMP_NAME}" | mysql "${MYSQL_DBNAME}"
 
 # If archive contains attachments, install them
-unzip -l "${BACKUP_ARTIFACT_PATH}" | grep -q "$(basename "${ATTACHMENTS_PATH}")"
+unzip -l "${BACKUP_PATH}" | grep -q "$(basename "${ATTACHMENTS_PATH}")"
 if [ "$?" = "0" ] ; then
-    unzip "${BACKUP_ARTIFACT_PATH}" "$(basename "${ATTACHMENTS_PATH}")/*" -d "${ATTACHMENTS_PATH}/../"
+    unzip "${BACKUP_PATH}" "$(basename "${ATTACHMENTS_PATH}")/*" -d "${ATTACHMENTS_PATH}/../"
 fi
