@@ -17,4 +17,4 @@ mkdir -p "$(dirname "${DUMP_PATH}")"
 mysqldump --single-transaction --skip-lock-tables "${MYSQL_DBNAME}" | zip > "${DUMP_PATH}"
 
 # Name the SQL dump within the archive (using DB name)
-printf "@ -\n@=%s.sql\n" "${MYSQL_DBNAME}" | zipnote -w "${DUMP_PATH}"
+printf "@ -\n@=database.sql\n" | zipnote -w "${DUMP_PATH}"
