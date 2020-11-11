@@ -16,5 +16,5 @@ unzip -p "${BACKUP_PATH}" "${BACKUP_DB_DUMP_NAME}" | mysql "${MYSQL_DBNAME}"
 # If archive contains attachments, install them
 unzip -l "${BACKUP_PATH}" | grep -q "$(basename "${ATTACHMENTS_PATH}")"
 if [ "$?" = "0" ] ; then
-    unzip -o "${BACKUP_PATH}" "$(basename "${ATTACHMENTS_PATH}")/*" -d "${ATTACHMENTS_PATH}/../"
+    unzip -oq "${BACKUP_PATH}" "$(basename "${ATTACHMENTS_PATH}")/*" -d "${ATTACHMENTS_PATH}/../"
 fi
