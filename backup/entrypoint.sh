@@ -13,7 +13,7 @@ EOF
 chmod 600 ~/.my.cnf
 
 # Create dir path if one doesn't exist
-mkdir -p "$(dirname "${DUMP_PATH}")"
+mkdir -p "$(dirname "${BACKUP_PATH}")"
 
 # Dump DB as a single transaction to facilitate a hot backup
 mysqldump --single-transaction --skip-lock-tables "${MYSQL_DBNAME}" | zip > "${BACKUP_PATH}"
