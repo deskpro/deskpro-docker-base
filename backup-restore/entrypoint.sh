@@ -10,6 +10,9 @@ EOF
 
 chmod 600 ~/.my.cnf
 
+# Create attachments dir path if one doesn't exist
+mkdir -p "${ATTACHMENTS_PATH}"
+
 # Unzip the DB dump and pipe into MySQL
 unzip -p "${BACKUP_PATH}" "${BACKUP_DB_DUMP_NAME}" | mysql "${MYSQL_DBNAME}"
 
