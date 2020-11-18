@@ -130,6 +130,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-sug
     supervisor \
     nginx-core \
     gettext \
+    mysql-client-8.0 \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /etc/nginx/nginx.conf \
     && rm -f /etc/nginx/modules-enabled/50-mod-http-image-filter.conf \
