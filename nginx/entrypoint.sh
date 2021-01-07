@@ -3,6 +3,8 @@ set -e
 
 # Default variable values
 export WORKER_PROCESSES=${WORKER_PROCESSES:-"auto"}
+export ACCESS_LOG_PATH=${ACCESS_LOG_PATH:-"/dev/stdout"}
+export ERROR_LOG_PATH=${ERROR_LOG_PATH:-"/dev/stderr"}
 
 rm -f "/etc/nginx/sites-enabled/default"
 rm -f /etc/nginx/deskpro_fastcgi_params
@@ -30,7 +32,7 @@ done
 
 # Generate the nginx master configuration
 # file from the template file
-envsubst '$WORKER_PROCESSES' < "/etc/nginx/nginx.conf.template" > "/etc/nginx/nginx.conf"
+envsubst '$WORKER_PROCESSES $ACCESS_LOG_PATH $ERROR_LOG_PATH' < "/etc/nginx/nginx.conf.template" > "/etc/nginx/nginx.conf"
 
 # Generate nginx config files for each template
 # file found in the nginx config directory

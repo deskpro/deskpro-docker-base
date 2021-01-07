@@ -34,8 +34,8 @@ http {
 	##
 	# Logging Settings
 	##
-	access_log /dev/stdout;
-	error_log /dev/stderr;
+	access_log $ACCESS_LOG_PATH;
+	error_log $ERROR_LOG_PATH;
 
 	##
 	# Gzip Settings
