@@ -166,9 +166,9 @@ RUN chmod a+x /etc/docker-entrypoint/*
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod a+x /usr/local/bin/entrypoint.sh
 
+COPY php-fpm.conf.template /etc/php/php-fpm.conf.template
 COPY www.conf.template /etc/php/php-fpm.d/www.conf.template
 
-RUN rm -f /var/log/php-fpm.log && ln -s /dev/stderr /var/log/php-fpm.log
 RUN rm -f /var/log/supervisor/supervisord.log && ln -s /dev/stderr /var/log/supervisor/supervisord.log
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
