@@ -1,7 +1,7 @@
-FROM ubuntu:20.04 AS build
+FROM alpine:3.13 AS build
 WORKDIR /root
 
-ENV DEBIAN_FRONTEND noninteractive
+ARG PHP_VERSION=7.4.14
 
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -13,43 +13,42 @@ ENV CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE
 ENV CPPFLAGS="$CFLAGS"
 ENV LDFLAGS="-Wl,-O1 -pie"
 
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
-    pkg-config \
-    build-essential \
+RUN apk --no-cache add \
+    alpine-sdk \
     autoconf \
     bison \
     re2c \
     curl \
-    libcurl4-openssl-dev \
-    autoconf \
+    curl-dev \
     libxml2 \
     libxml2-dev \
-    libonig5 \
-    libonig-dev \
-    libpng16-16 \
+    oniguruma \
+    oniguruma-dev \
+    krb5 \
+    krb5-dev \
+    libpng \
     libpng-dev \
-    libjpeg-turbo8 \
-    libjpeg-turbo8-dev \
-    libsodium23 \
+    libjpeg-turbo \
+    libjpeg-turbo-dev \
+    freetype \
+    freetype-dev \
+    c-client \
+    imap-dev \
+    icu \
+    icu-dev \
+    libldap \
+    openldap-dev \
+    libsodium \
     libsodium-dev \
-    libicu66 \
-    libicu-dev \
-    libldap-2.4-2 \
-    libldap2-dev \
-    libkrb5-3 \
-    libkrb5-dev \
-    libc-client2007e \
-    libc-client2007e-dev \
-    libzip5 \
+    libzip \
     libzip-dev \
-    libfreetype6 \
-    libfreetype6-dev \
-    && rm -rf /var/lib/apt/lists/*
+    gnu-libiconv \
+    gnu-libiconv-dev
 
-ADD https://www.php.net/distributions/php-7.4.11.tar.gz /root/
-RUN mkdir php-7.4.11 && tar -xzf /root/php-7.4.11.tar.gz -C php-7.4.11 --strip-components 1
+ADD https://www.php.net/distributions/php-$PHP_VERSION.tar.gz /root/
+RUN mkdir php-$PHP_VERSION && tar -xzf /root/php-$PHP_VERSION.tar.gz -C php-$PHP_VERSION --strip-components 1
 
-WORKDIR /root/php-7.4.11
+WORKDIR /root/php-$PHP_VERSION
 RUN ./buildconf --force
 RUN ./configure \
     --with-fpm-user=php \
@@ -106,23 +105,31 @@ RUN rm -f /etc/php/php-fpm.conf.default
 RUN rm -f /etc/php/php-fpm.d/*
 RUN rm -f /usr/lib/php/extensions/*/*.a
 
-FROM ubuntu:20.04
+FROM alpine:3.13
 
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
+ARG UID=82
+ARG USER=php
+ARG GID=82
+ARG GROUP=php
+
+ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
+
+RUN apk --no-cache add \
+    curl \
+    gettext \
     curl \
     libxml2 \
-    libonig5 \
-    libpng16-16 \
-    libjpeg-turbo8 \
-    libsodium23 \
-    libicu66 \
-    libldap-2.4-2 \
-    libkrb5-3 \
-    libc-client2007e \
-    libzip5 \
-    gettext \
-    libfreetype6 \
-    && rm -rf /var/lib/apt/lists/*
+    oniguruma \
+    krb5 \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    c-client \
+    icu \
+    libldap \
+    libsodium \
+    libzip \
+    gnu-libiconv
 
 RUN mkdir -p /etc/php/
 RUN mkdir -p /usr/lib/php/extensions
@@ -139,9 +146,9 @@ RUN for ext in /usr/lib/php/extensions/*/*.so ; do filename=$(echo ${ext##*/}| c
     mv "/etc/php/conf.d/00-pdo_mysql.ini" "/etc/php/conf.d/02-pdo_mysql.ini" && \
     sed -i -e 's/extension/zend_extension/' /etc/php/conf.d/00-opcache.ini
 
-# Create phpfpm user/group
-RUN groupadd -g 82 php
-RUN useradd -u 82 -c "PHP Fast Process Manager" -g 82 -r -m -d /var/lib/php php
+# Create php user/group
+RUN addgroup -g $GID $GROUP
+RUN adduser -u $UID -g "PHP" -G $GROUP -h /var/lib/php -D -S $USER
 
 COPY docker-entrypoint /etc/docker-entrypoint
 RUN chmod a+x /etc/docker-entrypoint/*
